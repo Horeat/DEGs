@@ -1,0 +1,69 @@
+{% extends 'usercenter-base.html' %} {% block title %}我的历史- DEGs{% endblock %} {% load staticfiles %} {% block custom_bread %}
+<section>
+    <div class="wp">
+        <ul class="crumbs">
+            <li><a href="{% url 'index' %}">首页</a>></li>
+            <li><a href="{% url 'users:user_info' %}">个人中心</a>></li>
+            <li>我的历史</li>
+        </ul>
+    </div>
+</section>
+{% endblock %} {% block left_content %}
+<div class="left">
+    <ul>
+        <li><a href="{% url 'users:user_info' %}">个人资料</a></li>
+        <li>
+            <a href="{% url 'users:mymessage' %}" style="position: relative;">
+        我的消息
+    </a>
+        </li>
+        <li class="active2">
+            <a href="{% url 'users:myhistory' %}" style="position: relative;">
+        我的历史
+    </a>
+        </li>
+    </ul>
+</div>
+{% endblock %} {% block right_content %}
+<div class="right">
+    <div class="personal_des Releasecont">
+        <div class="head">
+            <h1>我的历史</h1>
+        </div>
+
+    </div>
+    <div class="personal_des permessage">
+        <div class="messagelist">
+            {% for history in historys.object_list %}
+            <div class="messages">
+                <div class="fr">
+                    <div class="top"><span class="fl time">{{ history.use_time }}</span><span class="fr btn foldbtn"></span></div>
+                    <p>
+                        <a href="{{ MEDIA_URL }}{{ history.upload_file }}" class="downcode" target="_blank" download="" data-id="274" title="">上传文件（点击下载）</a> 使用方法编号：{{ history.method_id }} 使用参数：{{ history.args_choose }}
+                    </p>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+
+
+        <div class="pageturn pagerright">
+            <ul class="pagelist">
+                {% if historys.has_previous %}
+                <li class="long"><a href="?{{ historys.previous_page_number.querystring }}">上一页</a></li>
+                {% endif %} {% for page in historys.pages %} {% if page %} {% ifequal page historys.number %}
+                <li class="active"><a href="?{{ page.querystring }}">{{ page }}</a></li>
+                {% else %}
+                <li><a href="?{{ page.querystring }}" class="page">{{ page }}</a></li>
+                {% endifequal %} {% else %}
+                <li class="none"><a href="">...</a></li>
+                {% endif %} {% endfor %} {% if historys.has_next %}
+                <li class="long"><a href="?{{ historys.next_page_number.querystring }}">下一页</a></li>
+                {% endif %}
+
+            </ul>
+        </div>
+    </div>
+
+</div>
+{% endblock %}

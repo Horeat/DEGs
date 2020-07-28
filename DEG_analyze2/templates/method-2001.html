@@ -1,0 +1,216 @@
+{% extends 'base.html' %} {% block title %}方法详情 - DEGs{% endblock %} {% load staticfiles %} {% block custom_bread %}
+<section>
+    <div class="wp">
+        <ul class="crumbs">
+            <li><a href="/">首页</a>></li>
+            <li><a href="{% url 'methods:methods_list' %}">方法列表</a>></li>
+            <li>方法详情</li>
+        </ul>
+    </div>
+</section>
+{% endblock %} {% block content %}
+<section>
+    <div class="wp butler-detail-box butler-diaryd-box clearfix">
+        <div class="fl list">
+
+            <div class="butler_detail_list clearfix">
+                <div class="brief">
+                    <dl class="des">
+                        <dt>
+                            <div class="picpic">
+                                <img width="100" height="100" src="/static/images/method.jpg"/>
+                            </div>
+                        </dt>
+                        <dd>
+                            <a href="">
+                                <h1>{{ method.method_name }}</h1>
+                            </a>
+                            <ul class="cont">
+                                <li>方法详情：<span>{{ method.method_detail }}</span></li>
+                                <li>常用参数：<span>{{ method.args }}</span></li>
+                                <li>要求文件格式：<span>&nbsp;</span></li>
+                                <img width="600" height="80" src="/static/images/prob_data.jpg" />
+                            </ul>
+                        </dd>
+                    </dl>
+                </div>
+            </div>
+
+            <div class="butler_detail_cont clearfix">
+                <div class="left layout">
+                    <div class="head">
+                        <ul class="tab_header">
+                            <li class="active"><a href="">上传文件</a> </li>
+                        </ul>
+                    </div>
+                    <div class="companycenter">
+                        <div style="padding-top:30px; text-align: center; padding-bottom: 30px;">
+                            <form>
+                                {% csrf_token %}
+                                <input type="file" id="file">
+                                <input type="button" id="submit" style="width:100px; height:30px;" value="上传文件">
+                            </form>
+                            <div style="display: none;" id="loading1">
+                                <img width="200" height="110" src="/static/images/loading.gif" />
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+            </div>
+
+            <div class="butler_detail_cont clearfix">
+                <div class="left layout">
+                    <div class="head">
+                        <ul class="tab_header">
+                            <li class="active"><a href="">填写参数</a> </li>
+                        </ul>
+                    </div>
+                    <div class="companycenter">
+                        <div style="display: none;" id="AddArgs">
+                            <div style="padding-top:30px; text-align: center; padding-bottom: 30px;">
+                                <form>
+                                    {% csrf_token %}
+                                    <p><label style="font-size:small;">p_value < 
+                                        <input type="text" placeholder="“-”表示不使用该参数" id="p_value">
+                                        </label></p>
+                                    <p><label style="font-size:small;">FDR < 
+                                        <input type="text" placeholder="“-”表示不使用该参数" id="FDR">
+                                        </label></p>
+                                    <p><label style="font-size:small;">logFC > 
+                                        <input type="text" placeholder="“-”表示不使用该参数" id="logFC_big">
+                                        </label>
+                                        <label style="font-size:small;"> 或 <
+                                        <input type="text" placeholder="“-”表示不使用该参数" id="logFC_small">
+                                        </label></p>
+                                    <p>已进行log2变换：<input type="radio" name="if_log2" id="if_log2" value="1" checked> 未进行log2变换：
+                                        <input type="radio" id="if_log2" name="if_log2" value="0"></p>
+                                    <p><input type="button" id="submitArgs" style="width:100px; height:30px;" value="提交"></p>
+                                </form>
+                                <div style="display: none;" id="loading2">
+                                    <img width="200" height="110" src="/static/images/loading.gif" />
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </div>
+</section>
+
+<script>
+    $(function() {
+        $('#submit').click(function() {
+            //ajax上传文件必须通过FormData对象传输数据
+            var formdata = new FormData();
+
+            var csrf_data = $('input[name=csrfmiddlewaretoken]').val();
+            //获取上传文件对象(文件句柄)：定位对象，转成DOM对象，取值(文件对象列表)
+            var file = $('#file')[0].files[0];
+            if ($("#file").val() == "") {
+                alert('请选择上传的文件！');
+                return false;
+            }
+            var filepath = document.getElementById("file").value;
+            var fileend = filepath.substring(filepath.lastIndexOf("."));
+            if (fileend != ".csv") {
+                alert('不接受此文件类型,请上传csv格式的文件！\r\n');
+                return false;
+            }
+
+            formdata.append("method_type", "For Probe data");
+            formdata.append("method_id", "2001");
+            formdata.append('csrfmiddlewaretoken', csrf_data); //csrf认证的键是固定的
+            formdata.append('file', file);
+
+            $.ajax({
+                url: "/operation/uploadfile/",
+                type: 'post',
+                data: formdata,
+                processData: false, //不处理数据
+                contentType: false, //不设置内容类型，按原格式传输
+                beforeSend: function(XMLHttpRequest) {
+                    document.getElementById("loading1").style.display = "block";
+                },
+                success: function(arg) {
+                    document.getElementById("loading1").style.display = "none";
+                    alert(arg.msg)
+                    if (arg.status == "success")
+                        document.getElementById("AddArgs").style.display = "block";
+                }
+            })
+        })
+
+        $('#submitArgs').click(function() {
+            //ajax上传文件必须通过FormData对象传输数据
+            var formdata = new FormData();
+
+            var csrf_data = $('input[name=csrfmiddlewaretoken]').val();
+            var p_value = $("#p_value").val();
+            var FDR = $("#FDR").val();
+            var logFC_big = $("#logFC_big").val();
+            var logFC_small = $("#logFC_small").val();
+            var if_log2 = $("input[name='if_log2']:checked").val();
+            if (logFC_big == "" || logFC_small == "" || FDR == "" || p_value == "") {
+                alert('请输入参数！');
+                return false;
+            }
+            if ((logFC_big == '-' && logFC_small != '-') || (logFC_big != '-' && logFC_small == '-')) {
+                alert('logFC的两参数只允许同时为“-”：表示不使用logFC作为筛选条件；或同时不为“-”：表示使用logFC作为筛选条件！');
+                return false;
+            }
+            if (p_value == '-') {
+                p_value = 0.5;
+            }
+            if (FDR == '-') {
+                FDR = 0.5;
+            }
+            if (logFC_big == '-' && logFC_small == '-') {
+                logFC_big = 0;
+                logFC_small = 0;
+            }
+            if (logFC_big < 0 || logFC_small > 0) {
+                alert('请确保logFC大于一正数且小于一负数！');
+                return false;
+            }
+            if (FDR < 0 || FDR > 0.5) {
+                alert('确保参数FDR的取值在0 ~ 0.5之间，太大FDR值将失去意义！');
+                return false;
+            }
+            if (p_value < 0 || p_value > 0.5) {
+                alert('确保参数p_value的取值在0 ~ 0.5之间，太大p值将失去意义！');
+                return false;
+            }
+            formdata.append("method_type", "For Probe data");
+            formdata.append("method_id", "2001");
+            formdata.append('csrfmiddlewaretoken', csrf_data); //csrf认证的键是固定的
+            formdata.append('logFC_big', logFC_big);
+            formdata.append('logFC_small', logFC_small);
+            formdata.append('FDR', FDR);
+            formdata.append('p_value', p_value);
+            formdata.append('if_log2', if_log2);
+
+            $.ajax({
+                url: "/operation/check/",
+                type: 'post',
+                data: formdata,
+                processData: false, //不处理数据
+                contentType: false, //不设置内容类型，按原格式传输
+                beforeSend: function(XMLHttpRequest) {
+                    document.getElementById("loading2").style.display = "block";
+                },
+                success: function(arg) {
+                    document.getElementById("loading2").style.display = "none";
+                    alert('参数提交成功，点击确定后跳转结果页面!');
+                    location.href = "/operation/result_Prob/";
+                }
+            })
+        })
+
+    })
+</script>
+<script src="https://cdn.bootcss.com/jquery/3.4.1/jquery.js"></script>
+
+{% endblock %}

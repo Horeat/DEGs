@@ -1,0 +1,70 @@
+{% extends 'base.html' %} {% block title %}DEGS 首页{% endblock %} {% load staticfiles %} {% block custom_bread %} {% endblock %} {% block custom_js %}
+<script type="text/javascript" src="/static/js/index.js"></script>
+{% endblock %} {% block content %}
+<div class="banner">
+    <div class="wp">
+        <div class="fl">
+            <div class="imgslide">
+                <ul class="imgs">
+                    <li>
+                        <a href="">
+                            <img width="1200" height="478" src="/static/images/guide1.PNG" />
+                        </a>
+                    </li>
+                    <li>
+                        <a href="">
+                            <img width="1200" height="478" src="/static/images/guide2.PNG" />
+                        </a>
+                    </li>
+                    <li>
+                        <a href="">
+                            <img width="1200" height="478" src="/static/images/guide3.PNG" />
+                        </a>
+                    </li>
+                    <li>
+                        <a href="">
+                            <img width="1200" height="478" src="/static/images/guide4.PNG" />
+                        </a>
+                    </li>
+                    <li>
+                        <a href="">
+                            <img width="1200" height="478" src="/static/images/guide5.PNG" />
+                        </a>
+                    </li>
+                    <li>
+                        <a href="{% url 'methods:methods_list' %}">
+                            <img width="1200" height="478" src="/static/images/guide6.PNG" />
+                        </a>
+                    </li>
+                </ul>
+            </div>
+            <div class="unslider-arrow prev"></div>
+            <div class="unslider-arrow next"></div>
+        </div>
+
+    </div>
+
+
+</div>
+
+<section>
+    <div class="wp">
+        <ul class="feature">
+            <li class="feature1">
+                <img class="pic" src="/static/images/feature1.png" />
+                <p class="center">快速开始</p>
+            </li>
+            <li class="feature2">
+                <p class="text" style=" text-align:center;line-height:20px;">您可以在认真观看完轮播图后，按照图中最后一页的提示内容，采用此方法快速开始处理您的原文件。在使用该方式时，我们将不会记录您的任何使用记录，无法保留您上传的文件以及处理的结果，且平台的部分功能将不被支持，若数据意外丢失将无法找回。</p>
+            </li>
+            <li class="feature3">
+                <img class="pic" src="/static/images/feature3.png" />
+                <p class="center">登录注册</p>
+            </li>
+            <li class="feature4">
+                <p class="text" style=" text-align:center;line-height:20px;">您可以在认真观看完轮播图后，点击页面右上方注册按钮进行本平台的账号注册，在登录状态下处理您的原文件。使用该方式时，您可以在 “个人中心” 中查看您的常用方法、常用参数、上传文件和处理结果等。若有需求还可以通过留言功能与后台人员交流。</p>
+            </li>
+        </ul>
+    </div>
+</section>
+{% endblock %}

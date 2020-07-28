@@ -1,0 +1,142 @@
+{% extends 'base.html' %} {% block title %}结果展示 - DEGs{% endblock %} {% load staticfiles %} {% block custom_bread %}
+<section>
+    <div class="wp">
+        <ul class="crumbs">
+            <li><a href="/">首页</a>></li>
+            <li><a href="{% url 'methods:methods_list' %}">方法列表</a>></li>
+            <li>结果展示</li>
+        </ul>
+    </div>
+</section>
+{% endblock %} {% block content %}
+<section>
+    <div class="wp butler_list_box list">
+        <div class='left'>
+            <div class="butler_list layout">
+                <div class="head">
+                    <ul class="fl tab_header">
+                        <li {% ifequal sort '' %}class="active" {% endifequal %}><a href="?sort=">结果文件</a> </li>
+                        <li {% ifequal sort 'huoshan' %}class="active" {% endifequal %}><a href="?sort=huoshan">火山图</a></li>
+                    </ul>
+                    <div class="fr butler-num">共<span class="key">2</span>个文件&nbsp;&nbsp;&nbsp;</div>
+                </div>
+
+                {% ifequal sort '' %}
+                <div style="overflow:auto;width:950px;height:450px;">
+                    <table border="1" width="942px">
+                        <tbody>
+                            <tr bgcolor="#eeeeee" valign="top">
+                                <td bgcolor="#DEEBDC" colspan={{cols}} style="font-size: x-large;text-align:center;width:950px;height:30px;">Data table</td>
+                            </tr>
+                            <tr valign="top">
+                                {% for name in names %}
+                                <td bgcolor="#DEEBDC" style="font-size: large;text-align: center;width:950px;height:25px;">{{name}}</td>
+                                {% endfor %}
+                            </tr>
+                            {% for values in value_list %}
+                            <tr valign="top">
+                                {% for value in values %}
+                                <td bgcolor="#EEEEEE" nowrap="" style="font-size: medium;text-align: center;height:20px;">{{value}}</td>
+                                {% endfor %}
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+                <dl style="text-align: right;">
+                    <a href="{{the_file_path}}" class="downcode" target="_blank" download="" data-id="274" style="font-size: medium;" title="">以上仅展示前20行内容，点击此处下载该文件</a>
+                </dl>
+                {% else %}
+                <dl style="text-align: left;">
+                    <input type="button" id="DIY" style="width:100px; height:30px;" value="自定义绘图样式">
+                </dl>
+                <dl style="text-align: center;">
+                    <img width="900" height="500" src={{the_file_path}}/>
+                </dl>
+                <dl style="text-align: right;">
+                    <a href="{{the_file_path}}" class="downcode" target="_blank" download="" data-id="274" style="font-size: medium;" title="">点击此处下载该文件</a>
+                </dl>
+                {% endifequal %}
+
+            </div>
+
+            <div class="butler_detail_cont clearfix" style="display: none;" id="PictureArgs">
+                <div class="left layout">
+                    <div class="head">
+                        <ul class="tab_header">
+                            <li class="active"><a href="">绘图参数</a> </li>
+                        </ul>
+                    </div>
+                    <div class="companycenter">
+                        <div style="padding-top:30px; text-align: center; padding-bottom: 30px;">
+                            <form>
+                                {% csrf_token %}
+                                <p>请选择点的形状：“●”形 <input type="radio" name="shape" id="shape" value="o" checked> “+”形
+                                    <input type="radio" id="shape" name="shape" value="+"> “x”形
+                                    <input type="radio" id="shape" name="shape" value="x">
+                                </p>
+                                <p>上调基因的颜色：<input type="color" id="up_color" value="#E41A1C"></p>
+                                <p>下调基因的颜色：<input type="color" id="down_color" value="#377EB8"></p>
+                                <p>正常基因的颜色：<input type="color" id="normal_color" value="#808080"></p>
+                                <p><input type="button" id="submitPictureArgs" style="width:100px; height:30px;" value="提交"></p>
+                            </form>
+                            <div style="display: none;" id="loading">
+                                <img width="200" height="110" src="/static/images/loading.gif" />
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+</section>
+
+
+<script>
+    $(function() {
+        $('#DIY').click(function() {
+            $.ajax({
+                success: function(arg) {
+                    document.getElementById("PictureArgs").style.display = "block";
+                }
+            })
+        })
+
+        $('#submitPictureArgs').click(function() {
+            //ajax上传文件必须通过FormData对象传输数据
+            var formdata = new FormData();
+            var csrf_data = $('input[name=csrfmiddlewaretoken]').val();
+            var up_color = $("#up_color").val();
+            var down_color = $("#down_color").val();
+            var normal_color = $("#normal_color").val();
+            var shape = $("input[name='shape']:checked").val();
+            formdata.append("method_type", "For RNAseq data");
+            formdata.append('csrfmiddlewaretoken', csrf_data); //csrf认证的键是固定的
+            formdata.append('up_color', up_color);
+            formdata.append('down_color', down_color);
+            formdata.append('normal_color', normal_color);
+            formdata.append('shape', shape);
+
+            $.ajax({
+                url: "/operation/DIY_volcano/",
+                type: 'post',
+                data: formdata,
+                processData: false, //不处理数据
+                contentType: false, //不设置内容类型，按原格式传输
+                beforeSend: function(XMLHttpRequest) {
+                    document.getElementById("loading").style.display = "block";
+                },
+                success: function(arg) {
+                    document.getElementById("loading").style.display = "none";
+                    alert('参数提交成功，点击确定后刷新当前页面!如若图片未改变请再次刷新页面或清除一下浏览器缓存！！！');
+                    window.location.reload();
+                }
+            })
+        })
+
+    })
+</script>
+
+{% endblock %}
