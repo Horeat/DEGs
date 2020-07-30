@@ -2,7 +2,7 @@
 ---
 
 ## 前言
-###### 代码废铁在学习和整合了一些网上项目资源后，使用Python3、前端框架Djando2和MySQL数据库完成的首个Web项目。在此记录，以方便日后回顾，也希望能遇到有缘人拿去使用或学习。
+###### 代码废铁在学习和整合了一些网上项目资源后，使用Python3、前端框架Django2和MySQL数据库完成的首个Web项目。在此记录，以方便日后回顾，也希望能遇到有缘人拿去使用或学习。
 
 ## 一、平台功能简介
 1. 完善的用户功能和用户引导机制。包括用户的注册、登录、密码找回。还有个人中心中修改个人信息、修改密码、更换头像等。该平台账号使用邮箱注册，可通过邮箱或用户名登录，需保证此邮箱的可用性，后期用来接收系统的通知邮件。此外，用户使用的引导流程需要在平台首页显示。
@@ -161,7 +161,109 @@
 ![tu_8](/readme配图/8.png)
 
 
+## 五、在 Linux 上安装
 
-    
+[@wym6912](https://github.com/wym6912)
 
+在执行以下操作时需要保证自身的权限是全局管理员，需要使用的指令如下：
 
+```bash
+sudo -s
+```
+
+即可切换到 root 权限。
+
+### 克隆此项目
+
+更新软件目录源
+
+```bash
+apt update && apt upgrade
+```
+
+然后下载安装 `git`
+
+```bash
+apt install git
+```
+
+切换到目录并且克隆本项目
+
+```bash
+cd /opt/
+git clone https://github.com/Horeat/DEGs
+```
+
+### 配置数据库
+
+切换到安装目录，并安装 `mysql`
+
+```bash
+cd /opt/DEGs
+apt install mysql-server -y
+```
+
+一定要记住你设置的密码！在后续需要使用该密码进入 mysql。
+
+在这之前，需要对数据库 `degs.sql` 的编码格式进行替换。可以使用 `vim` 进行如下替换：
+
+```bash
+:%s/utf8mb4_0900_ai_ci/utf8_general_ci
+:%s/utf8mb4/utf8
+:wq
+```
+
+将数据导入到数据库中，第一步需要进行创建数据库，方法如下：
+
+```mysql
+create database degs;
+exit
+```
+
+接下来在命令行输入指令：
+
+```bash
+mysql -u用户名 -p密码 degs < degs.sql
+```
+
+### 配置 Python pip
+
+采用 `apt` 进行安装，并使用文件进行安装对应的库
+
+```bash
+apt install python3-pip
+pip3 install -r all_packages.txt
+```
+
+### 修改配置文件
+
+您在使用过程中需要对 `settings.py` 进行修改，文件路径如下：
+
+```bash
+/opt/DEGs/DEG_analyze2/settings.py
+```
+
+修改防火墙规则：在上述文件内修改 `ALLOWED_HOSTS` 内容即可
+
+```bash
+ALLOWED_HOSTS = ['*',]
+```
+
+修改数据库账户密码：在上述文件内修改 `DATABASE` 内容即可
+
+### 启动服务
+
+执行下列指令可以启动服务器
+
+```bash
+cd /opt/DEGs/DEG_analyze2
+python manage.py runserver 0.0.0.0:8000
+```
+
+## 常见错误参考
+
+[django.core.exceptions.ImproperlyConfigured: mysqlclient 1.3.13 or newer is required; you have 0.9.2](https://blog.csdn.net/weixin_45476498/article/details/100098297)
+
+[django.db.utils.InternalError: (1698, "Access denied for user 'root'@'localhost'")](https://blog.csdn.net/qq_41621362/article/details/103075160)
+
+[AttributeError: 'str' object has no attribute 'decode'](https://blog.csdn.net/qq_16844001/article/details/85110439)
